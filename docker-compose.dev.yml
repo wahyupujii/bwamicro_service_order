@@ -1,0 +1,51 @@
+services:
+  service_order:
+    build:
+      context: .
+    container_name: bwamicro_service_order
+    working_dir: /var/www
+    ports:
+      - "9002:9000"
+    env_file:
+      - .env
+    volumes:
+      - ./:/var/www
+    depends_on:
+      - db_order
+    networks:
+      - bwamicro
+
+  webserver:
+    image: nginx:alpine
+    container_name: bwamicro_webserver_order
+    ports:
+      - "8004:80"
+    volumes:
+      - ./:/var/www
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    depends_on:
+      - service_order
+    networks:
+      - bwamicro
+
+  db_order:
+    image: mysql:5.7
+    container_name: bwamicro_db_order
+    ports:
+      - "3304:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bwamicro_order
+      MYSQL_USER: bwamicro_order
+      MYSQL_PASSWORD: bwamicro_order
+    volumes:
+      - bwamicro_volume_order:/var/lib/mysql
+    networks:
+      - bwamicro
+
+volumes:
+  bwamicro_volume_order:
+
+networks:
+  bwamicro:
+    external: true
