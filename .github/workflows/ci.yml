@@ -3,7 +3,7 @@ name: Build and Push Docker Image to Docker Hub
 on:
   push:
     branches:
-      - main 
+      - main
 
 jobs:
   build-and-push:
@@ -11,7 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      IMAGE_NAME: mochaaii/bwamicro_service_order
+      IMAGE_SERVICE_ORDER_NAME: mochaaii/bwamicro_service_order
+      IMAGE_SERVICE_ORDER_TAG: latest
+      IMAGE_WEBSERVER_ORDER_NAME: mochaaii/bwamicro_webserver_order
+      IMAGE_WEBSERVER_ORDER_TAG: latest
 
     steps:
       - name: Checkout Repository
@@ -26,15 +29,21 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Build and Push Docker Image
+      - name: Build and Push Docker Image Service Order
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: |
-            ${{ env.IMAGE_NAME }}:latest
-        continue-on-error: false
+          tags: ${{ env.IMAGE_SERVICE_ORDER_NAME }}:${{ env.IMAGE_SERVICE_ORDER_TAG }}
+
+      - name: Build and Push Docker Image Webserver Order
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.webserver
+          push: true
+          tags: ${{ env.IMAGE_WEBSERVER_ORDER_NAME }}:${{ env.IMAGE_WEBSERVER_ORDER_TAG }}
 
       - name: Logout from Docker Hub
         run: docker logout

@@ -22,7 +22,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www
 
 # Copy Laravel project to container
-COPY . .
+COPY . /var/www
 
 # Install PHP dependencies
 # RUN composer install --no-interaction --prefer-dist --optimize-autoloader
